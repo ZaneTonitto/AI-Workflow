@@ -1,0 +1,33 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Editor / IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Node (for MCP servers)
+node_modules/
+dist/
+*.tgz
+
+# Python (for MCP servers)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+.tmp/
