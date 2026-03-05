@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "ediprod": {
+      "url": "https://ediprod.mcp.wtg.zone",
+      "type": "http"
+    },
+    "documentation": {
+      "url": "https://knowledge.mcp.wtg.zone",
+      "type": "http"
+    }
+  }
+}
