@@ -175,13 +175,13 @@ AQN 03-Mar-26 09:23 GMT+11:00:
 You MUST preserve all existing description content. To do this:
 1. Read the current description from the `get-job-details` response.
 2. Prepend the existing content, then add a blank line separator.
-3. Add your own timestamped note using this format:
+3. Add your own **bolded timestamped note** using this format:
    ```
-   triage-agent {DD-MMM-YY HH:MM} GMT+{offset}: 
+   **triage-agent {DD-MMM-YY HH:MM} GMT+{offset}:**
    ```
    Use the current UTC time converted to the local timezone (use `+11:00` as default if unknown). Example:
    ```
-   triage-agent 06-Mar-26 14:30 GMT+11:00:
+   **triage-agent 06-Mar-26 14:30 GMT+11:00:**
    ```
 4. Follow your timestamp with the resolution plan HTML.
 
@@ -189,7 +189,7 @@ The final description sent to `update-job-details` should look like:
 ```
 {existing description content}
 
-triage-agent {timestamp}:
+**triage-agent {timestamp}:**
 {resolution plan HTML}
 ```
 
