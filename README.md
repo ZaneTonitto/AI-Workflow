@@ -6,10 +6,10 @@ Custom AI workflow for software engineering — a curated collection of agents, 
 
 ```
 AI-Workflow/
+├── .copilot/        # Copilot CLI config (MCP servers, etc.)
 ├── agents/          # Custom agent definitions and personas
 ├── skills/          # Reusable skill definitions for agents
-├── references/      # Reference documentation agents can consult
-└── mcp-servers/     # MCP server configurations and custom servers
+└── references/      # Reference documentation agents can consult
 ```
 
 ## Quick Start
@@ -28,7 +28,7 @@ Add reference material to `references/` — coding standards, architecture docs,
 
 ### MCP Servers
 
-Configure and develop MCP (Model Context Protocol) servers in `mcp-servers/`. These provide tool integrations that agents can invoke. See [`mcp-servers/README.md`](mcp-servers/README.md).
+MCP server connections are configured in [`.copilot/mcp.json`](.copilot/mcp.json).
 
 ## Contributing
 
