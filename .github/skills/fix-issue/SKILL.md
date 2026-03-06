@@ -41,31 +41,51 @@ Retrieve the resolution plan that serves as the handoff document from the issue-
    ```
    git branch --show-current
    ```
-4. **If on `master` or an unrelated branch**, read the staff code from `$env:STAFF_CODE` and create a new feature branch:
+4. **If already on a branch whose name contains the job number** (e.g., `ZTT/WI01038212/null-ref-workflow-exception` from a prior run), stay on it and continue — skip to Step 3.
+5. **Otherwise (on `master`, `main`, or any unrelated branch)**, you MUST create a new feature branch before making any changes. Read the staff code from `$env:STAFF_CODE` and create the branch:
    ```
    git checkout -b {STAFF_CODE}/{jobNumber}/{wi-summary-kebab-case}
    ```
    Where `{wi-summary-kebab-case}` is the work item title converted to lowercase kebab-case (e.g., `null-reference-in-workflow-exception-reader`). Truncate to 60 characters max if needed.
-5. **If already on a branch that matches the job number** (e.g., from a prior run), stay on it and continue.
 
-### Step 3 — Verify and Understand Target Files
+   **CRITICAL:** Never make code changes directly on `master` or `main`. Always branch first. If branch creation fails, stop and report to the user.
 
-Before making ANY code changes, read and understand every file listed in the resolution plan.
+### Step 3 — Locate and Understand Target Files
 
-1. **Read each target file** from the local repo using the file path from the plan. Read the full file or at minimum the class/method being modified plus 30 lines of surrounding context.
-2. **Verify the plan's accuracy** — confirm that:
+Before making ANY code changes, use the `github-code-navigation` skill to locate and read every file listed in the resolution plan. GitHub code search is faster than local filesystem search — use it as the primary file discovery mechanism.
+
+1. **Locate each target file via GitHub code search** — use the `github-code-navigation` skill to find the file:
+   ```
+   mcp_github_search_code
+     query: "class {ClassName} repo:WiseTechGlobal/CargoWise"
+   ```
+   or if you have a path from the plan:
+   ```
+   mcp_github_get_file_contents
+     owner: "WiseTechGlobal"
+     repo: "CargoWise"
+     path: "{path-from-plan}"
+   ```
+   This lets you confirm the file exists and read its contents without slow local filesystem operations.
+2. **Read the file contents via GitHub** to understand the current state. Read the full file or at minimum the class/method being modified plus 30 lines of surrounding context.
+3. **Verify the plan's accuracy** — confirm that:
    - The file exists at the specified path
    - The line numbers match (they may have shifted since the plan was written)
    - The "before" code snippets in the plan match what's actually in the file
    - The class/method signatures match
-3. **Check for recent changes** to each target file since the plan was written. If the plan contains a timestamp, use it; otherwise assume it was written today:
+4. **Check for recent changes** to each target file since the plan was written. If the plan contains a timestamp, use it; otherwise assume it was written today:
    ```
-   git log --oneline --since="{plan-date}" -- "{file-path}"
+   mcp_github_list_commits
+     owner: "WiseTechGlobal"
+     repo: "CargoWise"
+     path: "{file-path}"
+     per_page: 5
    ```
-   If there are recent commits touching the target files, read those diffs to understand what changed and whether the plan's assumptions still hold.
-4. **If discrepancies are found:**
+   If there are recent commits touching the target files, use `mcp_github_get_commit` to read those diffs and understand whether the plan's assumptions still hold.
+5. **If discrepancies are found:**
    - Minor line number shifts: adjust and proceed.
    - Structural changes (method renamed, file moved, code refactored): stop and report to the user that the plan may be outdated.
+6. **Only after confirming locations and plan accuracy**, read the files from the local repo for editing. The local read is for the edit step — discovery and verification should happen via GitHub.
 5. **Study the surrounding code patterns** — before writing any code, understand:
    - Naming conventions used in this file and namespace (PascalCase, prefixes, suffixes)
    - Error handling patterns (how are exceptions thrown, caught, logged?)
@@ -169,11 +189,13 @@ Every fix must have corresponding unit tests. Follow CargoWise conventions stric
    dotnet build "{path-to-test-project.csproj}" --no-dependencies
    ```
    If the test project has dependencies that also need building, drop `--no-dependencies`. But never build the full `.sln` unless explicitly needed.
-7. **Run the new tests** to verify they pass:
+7. **Run the new tests immediately** to verify they pass. Do NOT skip this step — tests must be executed after being written to confirm they work:
    ```
    dotnet test "{path-to-test-project.csproj}" --filter "{TestClassName}" --no-build
    ```
    If tests fail, diagnose and fix. **Maximum 3 attempts** — if the tests still fail after 3 fix-and-retry cycles, stop and report the failure to the user with the error details. Do not loop indefinitely.
+
+   **CRITICAL:** Do not proceed to the next step until you have actually run the tests and confirmed they pass. Writing tests without running them is incomplete work.
 
 ### Step 6 — Validate the Changes
 
