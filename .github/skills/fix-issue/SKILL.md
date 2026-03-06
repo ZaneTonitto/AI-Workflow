@@ -1,7 +1,7 @@
 # Fix Issue
 
 ## Purpose
-Given a work item number that has been triaged by the issue-triager agent, read the resolution plan from the work item description and implement the fix — production code changes, unit tests, and a pull request — in the locally cloned CargoWise repository.
+Given a work item number that has been triaged by the issue-triager agent, read the resolution plan from the work item description and implement the fix — production code changes and unit tests — in the locally cloned CargoWise repository. Changes are left uncommitted for the developer to review.
 
 ## Trigger
 User provides a job number (e.g., `WI00878427`) that already has a resolution plan in its work item description.
@@ -32,20 +32,21 @@ Retrieve the resolution plan that serves as the handoff document from the issue-
    ```
    cd C:\git\GitHub\WiseTechGlobal\CargoWise
    ```
-2. **Ensure the repo is on `master` and up to date:**
+2. **Check for uncommitted changes:**
    ```
-   git checkout master
-   git pull origin master
+   git status --porcelain
    ```
-3. **Read the staff code** from the environment:
+   If there are uncommitted changes, stop and ask the user to stash or commit them first. Do NOT create a branch with someone else's uncommitted work mixed in.
+3. **Check the current branch:**
    ```
-   $env:STAFF_CODE
+   git branch --show-current
    ```
-4. **Create a feature branch** using the naming convention:
+4. **If on `master` or an unrelated branch**, read the staff code from `$env:STAFF_CODE` and create a new feature branch:
    ```
    git checkout -b {STAFF_CODE}/{jobNumber}/{wi-summary-kebab-case}
    ```
    Where `{wi-summary-kebab-case}` is the work item title converted to lowercase kebab-case (e.g., `null-reference-in-workflow-exception-reader`). Truncate to 60 characters max if needed.
+5. **If already on a branch that matches the job number** (e.g., from a prior run), stay on it and continue.
 
 ### Step 3 — Verify and Understand Target Files
 
@@ -57,10 +58,15 @@ Before making ANY code changes, read and understand every file listed in the res
    - The line numbers match (they may have shifted since the plan was written)
    - The "before" code snippets in the plan match what's actually in the file
    - The class/method signatures match
-3. **If discrepancies are found:**
+3. **Check for recent changes** to each target file since the plan was written. If the plan contains a timestamp, use it; otherwise assume it was written today:
+   ```
+   git log --oneline --since="{plan-date}" -- "{file-path}"
+   ```
+   If there are recent commits touching the target files, read those diffs to understand what changed and whether the plan's assumptions still hold.
+4. **If discrepancies are found:**
    - Minor line number shifts: adjust and proceed.
    - Structural changes (method renamed, file moved, code refactored): stop and report to the user that the plan may be outdated.
-4. **Study the surrounding code patterns** — before writing any code, understand:
+5. **Study the surrounding code patterns** — before writing any code, understand:
    - Naming conventions used in this file and namespace (PascalCase, prefixes, suffixes)
    - Error handling patterns (how are exceptions thrown, caught, logged?)
    - Null handling patterns (null guards, null coalescing, early returns)
@@ -101,6 +107,27 @@ mcp_github_search_code
   query: "{pattern or method name} repo:WiseTechGlobal/CargoWise"
 ```
 
+**When encountering unfamiliar domain concepts**, use the `documentation` MCP server to look up business rules, module behavior, or terminology before making assumptions:
+```
+search-knowledge-digested
+  sources: ["developer-docs", "user-docs"]
+  query: "{domain term, module name, or business concept}"
+```
+Use this whenever:
+- The resolution plan references domain logic you don't fully understand
+- You need to understand the intended behavior of a module before deciding how to guard against edge cases
+- A method name, field name, or enum value has unclear business meaning
+- You're unsure whether a behavior is "by design" or a bug
+
+Do NOT guess at domain semantics — look them up.
+
+**When creating new files** (new classes, interfaces, etc.):
+- **Placement**: find an existing file in the same module/namespace and place the new file alongside it. Use `Get-ChildItem` or `github-code-navigation` to confirm the correct directory.
+- **Namespace**: match the namespace of sibling files in the same directory.
+- **Project file**: if the project uses explicit file includes (not default glob), add the new file to the `.csproj` `<Compile Include="..." />` items. Check the `.csproj` first — modern SDK-style projects auto-include and don't need this.
+- **Naming**: follow the existing naming convention in the directory (e.g., `I{Name}.cs` for interfaces, `{Name}Base.cs` for abstract classes).
+- **Boilerplate**: match the `using` block, license header (if any), and file structure of adjacent files.
+
 ### Step 5 — Write Unit Tests
 
 Every fix must have corresponding unit tests. Follow CargoWise conventions strictly.
@@ -137,28 +164,30 @@ Every fix must have corresponding unit tests. Follow CargoWise conventions stric
 5. **Include both positive and negative tests:**
    - Test that the fix resolves the original issue (the case that was broken)
    - Test that existing behavior is preserved (regression test — the case that was already working)
-6. **Build the test project** to verify compilation:
+6. **Build the test project** to verify compilation. Build only the specific `.csproj`, not the entire solution:
    ```
-   dotnet build "{path-to-test-project.csproj}"
+   dotnet build "{path-to-test-project.csproj}" --no-dependencies
    ```
+   If the test project has dependencies that also need building, drop `--no-dependencies`. But never build the full `.sln` unless explicitly needed.
 7. **Run the new tests** to verify they pass:
    ```
-   dotnet test "{path-to-test-project.csproj}" --filter "{TestClassName}"
+   dotnet test "{path-to-test-project.csproj}" --filter "{TestClassName}" --no-build
    ```
-   If tests fail, diagnose and fix. Do not proceed with a failing test.
+   If tests fail, diagnose and fix. **Maximum 3 attempts** — if the tests still fail after 3 fix-and-retry cycles, stop and report the failure to the user with the error details. Do not loop indefinitely.
 
 ### Step 6 — Validate the Changes
 
-Before committing, validate the implementation:
+Before finishing, validate the implementation:
 
-1. **Build the production project** to ensure no compilation errors:
+1. **Build the production project** to ensure no compilation errors. Build only the specific `.csproj`:
    ```
    dotnet build "{path-to-production-project.csproj}"
    ```
-2. **Run the relevant test suite** (not just new tests — run the full test class/project):
+2. **Run only the new tests** to confirm they pass. Filter by the specific test method names you wrote:
    ```
-   dotnet test "{path-to-test-project.csproj}"
+   dotnet test "{path-to-test-project.csproj}" --no-build --filter "FullyQualifiedName~{TestMethodName1}|FullyQualifiedName~{TestMethodName2}"
    ```
+   If tests fail, diagnose and fix. **Maximum 3 attempts** — if they still fail after 3 fix-and-retry cycles, stop and report the failure to the user with the error details. Do not loop indefinitely.
 3. **Review the diff** to ensure only intended changes are included:
    ```
    git diff
@@ -168,73 +197,39 @@ Before committing, validate the implementation:
    - No unrelated files modified
    - No debug code left in (console.log, System.Diagnostics.Debug, commented-out code)
    - No TODO comments left by you
-4. **If build or tests fail**, diagnose the issue, fix it, and re-validate. Do not commit broken code.
+4. **If the build fails**, diagnose the issue, fix it, and re-validate. **Maximum 3 attempts** — if it still fails after 3 cycles, stop and report to the user with the full error output. Do not loop indefinitely or leave broken code.
 
-### Step 7 — Commit and Create Pull Request
+### Step 7 — Change Summary
 
-1. **Stage the changes:**
-   ```
-   git add -A
-   ```
-2. **Commit with a clear message:**
-   ```
-   git commit -m "{jobNumber}: {concise summary of the fix}"
-   ```
-   Example: `git commit -m "WI01038212: Add null guard for exceptionType in WorkflowExceptionReader"`
-3. **Push the branch:**
-   ```
-   git push -u origin {branch-name}
-   ```
-4. **Create the pull request** using the GitHub MCP tool:
-   ```
-   mcp_github_create_pull_request
-     owner: "WiseTechGlobal"
-     repo: "CargoWise"
-     title: "{STAFF_CODE}/{jobNumber}/{WI Summary}"
-     body: "{PR description — see template below}"
-     head: "{branch-name}"
-     base: "master"
-   ```
+Present a concise summary of what was done so the developer can quickly orient before reviewing:
 
-**PR title format:** `{STAFF_CODE}/{jobNumber}/{WI Summary}`
-- Example: `AQN/WI01038212/Null reference in WorkflowExceptionReader`
+```
+## Change Summary
 
-**PR body template:**
-```markdown
-## {jobNumber} — {WI Title}
+**Job:** {jobNumber} — {title}
+**Branch:** {branch-name}
 
-### Problem
-{One-sentence summary of the issue from the resolution plan's Problem Statement.}
-
-### Fix
-{Concise description of what was changed and why.}
-
-### Changes
+### Files Modified
 - `{path/to/file.cs}` — {what was changed}
-- `{path/to/test.cs}` — {tests added}
+- `{path/to/file.cs}` — {what was changed}
 
-### Testing
-- {List of test scenarios added}
-- All existing tests in `{TestClassName}` pass.
+### Files Created
+- `{path/to/new-file.cs}` — {purpose}
+(omit this section if no files were created)
 
-### Resolution Plan
-See work item description for the full triage and resolution plan.
+### Tests Added
+- `{TestClassName}.{TestMethodName}` — {what it tests}
+- `{TestClassName}.{TestMethodName}` — {what it tests}
+
+### Build & Test Status
+- Production build: ✅ Pass
+- Test build: ✅ Pass
+- Test run: ✅ {N} passed, {N} failed
 ```
 
-### Step 8 — Update the Work Item
+### Step 8 — Retrospective
 
-After the PR is created:
-
-1. **Add a note to the work item description** via `update-job-details`, preserving existing content and prepending a timestamped update:
-   ```
-   **fix-agent {DD-MMM-YY HH:MM} GMT+{offset}:**
-   Implementation complete. PR: {PR URL}
-   Branch: {branch-name}
-   ```
-
-### Step 9 — Retrospective
-
-After the task is complete (PR created and work item updated), reflect on your performance. Present a brief retrospective to the user:
+After the implementation is complete (builds pass, tests pass, diff reviewed), reflect on your performance. Present a brief retrospective to the user:
 
 ```
 ## Retrospective
@@ -278,8 +273,30 @@ After the task is complete (PR created and work item updated), reflect on your p
 | Target file has been heavily modified since the plan | Stop. Report that the plan may be stale and ask for re-triage. |
 | Build fails after applying the fix | Diagnose and attempt to fix compilation errors. If the root cause is unclear, report to user. |
 | Tests fail after applying the fix | Diagnose test failure. If the test logic is wrong, fix it. If the production code is wrong, revisit the fix. |
-| Plan specifies a High-complexity fix without before/after snippets | Proceed carefully; read extra context; confirm approach with user before writing code. |
+| Plan specifies a High-complexity fix without before/after snippets | Present a mini-proposal to the user BEFORE writing code (see below). |
+| Working tree has uncommitted changes | Stop. Ask the user to stash or commit existing changes before proceeding. |
+| Build or test failure persists after 3 fix attempts | Stop. Report the full error output to the user and ask for guidance. |
+
+**High-complexity mini-proposal format** — when the plan is High complexity and lacks before/after snippets, present this to the user for approval before writing any code:
+```
+## Proposed Approach — {jobNumber}
+
+### What I plan to change
+- {File 1}: {specific change description}
+- {File 2}: {specific change description}
+
+### Patterns I'll follow
+- {Pattern observed in surrounding code that I'll match}
+
+### Open questions
+- {Anything unclear in the plan that could affect the implementation}
+
+### Risks
+- {Anything that might go wrong with this approach}
+```
+Wait for user approval before proceeding to Step 4. |
 | No existing test class found for the target class | Create a new test class following the naming and structure conventions of the nearest test project. |
+| Already on a branch matching the job number | Stay on it and continue — do not create a new branch. |
 | $env:STAFF_CODE is not set | Stop. Ask the user to set the environment variable. |
 
 ## Quality Checks
@@ -293,7 +310,6 @@ After the task is complete (PR created and work item updated), reflect on your p
 - [ ] Production project builds successfully
 - [ ] Test project builds and all tests pass
 - [ ] Git diff contains only intended changes
-- [ ] Commit message references the job number
-- [ ] PR created with correct title format: `{STAFF_CODE}/{jobNumber}/{WI Summary}`
-- [ ] Work item updated with fix-agent note and PR link
+- [ ] Changes are left uncommitted for developer review
+- [ ] Change summary presented to user
 - [ ] Retrospective completed
