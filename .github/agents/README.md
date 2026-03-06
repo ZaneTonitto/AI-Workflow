@@ -1,10 +1,17 @@
 # Agents
 
-Custom agent definitions for software engineering workflows.
+Custom agent definitions for CargoWise development workflows.
+
+## Current Agents
+
+| Agent | Description |
+| ----- | ----------- |
+| [issue-triager](issue-triager.agent.md) | Triage and analyze work items (WI, CS, PRJ) — investigate issues, search related items, and produce resolution plans. |
+| [issue-fixer](issue-fixer.agent.md) | Implement code fixes in the CargoWise repository using a resolution plan from the issue-triager agent. |
 
 ## Structure
 
-Each agent is defined in its own file (Markdown or YAML) and should include:
+Each agent is defined in its own `.agent.md` file and should include:
 
 | Field           | Description                                        |
 | --------------- | -------------------------------------------------- |
@@ -12,11 +19,10 @@ Each agent is defined in its own file (Markdown or YAML) and should include:
 | **Description** | What the agent does and when to use it             |
 | **Persona**     | System-level instructions / personality             |
 | **Skills**      | List of skills from `../skills/` the agent can use |
-| **References**  | Relevant docs from `../references/`                |
-| **MCP Servers** | MCP servers the agent connects to                  |
+| **Tools**       | MCP tools and built-in tools the agent can access  |
 
 ## Conventions
 
 - One agent per file.
-- Use kebab-case filenames (e.g., `code-reviewer.md`).
+- Use kebab-case filenames (e.g., `code-reviewer.agent.md`).
 - Keep the persona focused — an agent that tries to do everything does nothing well.

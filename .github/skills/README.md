@@ -1,19 +1,22 @@
 # Skills
 
-Reusable skill definitions that can be composed into agents.
+Reusable skill definitions that can be composed into agents for CargoWise development.
+
+## Current Skills
+
+| Skill | Description |
+| ----- | ----------- |
+| [triage-issue](triage-issue/) | Investigate a work item, gather context, and produce a resolution plan. |
+| [fix-issue](fix-issue/) | Implement a code fix and write unit tests based on a resolution plan. |
+| [github-code-navigation](github-code-navigation/) | Locate files and understand code patterns via GitHub code search. |
 
 ## What is a Skill?
 
-A skill is a well-defined capability — a set of instructions, tool access, and context that lets an agent perform a specific task. Examples:
-
-- **Code Review** — Analyze diffs for bugs, security issues, and style violations.
-- **Test Generation** — Create unit/integration tests for a given module.
-- **Refactoring** — Apply safe, incremental refactoring patterns.
-- **Documentation** — Generate or update docs from code.
+A skill is a well-defined capability — a set of instructions, tool access, and context that lets an agent perform a specific task.
 
 ## Structure
 
-Each skill file should include:
+Each skill lives in its own subdirectory containing a `SKILL.md` file:
 
 | Field              | Description                                      |
 | ------------------ | ------------------------------------------------ |
@@ -21,10 +24,9 @@ Each skill file should include:
 | **Description**    | What the skill enables                           |
 | **Instructions**   | Detailed instructions for executing the skill    |
 | **Tools Required** | Any MCP tools or CLI tools the skill depends on  |
-| **References**     | Relevant reference material from `../references/`|
 
 ## Conventions
 
-- One skill per file.
-- Use kebab-case filenames (e.g., `code-review.md`).
+- One skill per directory.
+- Use kebab-case directory names (e.g., `code-review/`).
 - Skills should be composable — avoid coupling skills to specific agents.

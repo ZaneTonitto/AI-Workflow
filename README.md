@@ -1,37 +1,41 @@
 # AI-Workflow
 
-Custom AI workflow for software engineering — a curated collection of agents, skills, reference material, and MCP server configurations.
+Custom AI agents and skills for development on **CargoWise** — a curated collection of agent definitions and reusable skills used by GitHub Copilot.
 
 ## Directory Structure
 
 ```
 AI-Workflow/
-├── .copilot/        # Copilot CLI config (MCP servers, etc.)
-├── agents/          # Custom agent definitions and personas
-├── skills/          # Reusable skill definitions for agents
-└── references/      # Reference documentation agents can consult
+└── .github/
+    ├── agents/      # Custom agent definitions
+    └── skills/      # Reusable skill definitions for agents
 ```
 
-## Quick Start
+## Agents
 
-### Agents
+Agent definitions live in `.github/agents/`. Each agent has a focused purpose and a set of assigned skills.
 
-Place agent definition files in `agents/`. Each agent should have a clear purpose, persona, and set of assigned skills. See [`agents/README.md`](agents/README.md) for the expected format.
+| Agent | Description |
+| ----- | ----------- |
+| [issue-triager](.github/agents/issue-triager.agent.md) | Triage and analyze CargoWise work items (WI, CS, PRJ) — investigate issues, search related items, and produce resolution plans. |
+| [issue-fixer](.github/agents/issue-fixer.agent.md) | Implement code fixes in the CargoWise repository using a resolution plan from the issue-triager agent. |
 
-### Skills
+See [`.github/agents/README.md`](.github/agents/README.md) for conventions.
 
-Define reusable skills in `skills/`. Skills encapsulate specific capabilities (e.g., code review, test generation) that can be composed into agents. See [`skills/README.md`](skills/README.md).
+## Skills
 
-### References
+Reusable skills live in `.github/skills/`. Skills encapsulate specific capabilities that can be composed into agents.
 
-Add reference material to `references/` — coding standards, architecture docs, API specs, style guides, or any context agents should have access to. See [`references/README.md`](references/README.md).
+| Skill | Description |
+| ----- | ----------- |
+| [triage-issue](.github/skills/triage-issue/) | Investigate a work item, gather context, and produce a resolution plan. |
+| [fix-issue](.github/skills/fix-issue/) | Implement a code fix and write unit tests based on a resolution plan. |
+| [github-code-navigation](.github/skills/github-code-navigation/) | Locate files and understand code patterns via GitHub code search. |
 
-### MCP Servers
-
-MCP server connections are configured in [`.copilot/mcp.json`](.copilot/mcp.json).
+See [`.github/skills/README.md`](.github/skills/README.md) for conventions.
 
 ## Contributing
 
 1. Follow the README conventions in each subdirectory when adding new items.
 2. Keep agent definitions focused — one agent per concern.
-3. Document any external dependencies in the relevant subdirectory.
+3. Skills should be composable — avoid coupling skills to specific agents.
