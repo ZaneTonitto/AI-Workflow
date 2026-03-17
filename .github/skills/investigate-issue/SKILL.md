@@ -156,8 +156,8 @@ Present a structured summary:
 - {List of linked WIs/CSs/PRJs with their titles and statuses}
 ```
 
-### Step 4 — Resolution Plan (Issue-Fixer Handoff)
-Produce a resolution plan structured as a **handoff document for an issue-fixer agent**. The fixer agent will receive ONLY this document — it will not re-investigate, so every piece of context it needs must be included.
+### Step 4 — Resolution Plan
+Produce a self-contained resolution plan that includes all the context needed to implement a fix — whether by a human engineer or an automated agent. The reader should not need to re-investigate the issue.
 
 **Output:** Write to `{jobNumber}-resolution-plan.md` in the repo root.
 
@@ -194,7 +194,7 @@ The plan MUST follow this structure:
 
 ## Fix Specification
 
-Describe the EXACT changes the fixer agent should make. Be as specific as possible — the fixer should not need to re-investigate the issue.
+Describe the EXACT changes required. Be specific enough that an implementer does not need to re-investigate the issue.
 
 ### Files to Modify
 
@@ -212,7 +212,7 @@ Describe the EXACT changes the fixer agent should make. Be as specific as possib
 ### Code Changes
 
 {Include this section when source code was inspected in Step 2a AND the fix is Low or Medium complexity.
-For each change, show a before/after code snippet so the fixer can see exactly what to modify.
+For each change, show a before/after code snippet so the implementer can see exactly what to modify.
 Omit this section for High complexity fixes where multiple interrelated changes make snippets misleading.}
 
 **{path/to/file.cs}** — Line {N}
@@ -245,19 +245,19 @@ After:
 ```
 
 **Guidelines for writing the plan:**
-- **Be exhaustive on context** — the fixer agent has no prior knowledge of the issue.
-- **Be prescriptive on implementation** — tell the fixer exactly what to change, not just where to look.
-- **Include before/after code snippets** — when source code was read in Step 2a and the fix is Low or Medium complexity, include concrete before/after code blocks in the "Code Changes" section. This removes ambiguity and lets the fixer apply changes directly. Use the same snippets in the markdown file.
-- **Separate investigation from action** — all investigation should be done during triage. The plan should contain conclusions, not "investigate X" steps.
+- **Be exhaustive on context** — the reader may have no prior knowledge of the issue.
+- **Be prescriptive on implementation** — describe exactly what to change, not just where to look.
+- **Include before/after code snippets** — when source code was read in Step 2a and the fix is Low or Medium complexity, include concrete before/after code blocks in the "Code Changes" section. This removes ambiguity and lets the implementer apply changes directly. Use the same snippets in the markdown file.
+- **Separate investigation from action** — all investigation should be done during this phase. The plan should contain conclusions, not "investigate X" steps.
 - **Include source links** — GitHub permalink URLs to the exact lines where changes are needed.
 - **Name specific files and line numbers** — vague references like "the reader class" are not acceptable.
-- **Keep workflow/process steps out** — PR submission, WI updates, patchbacks are NOT part of the fixer's scope. Only include code changes and testing.
+- **Keep workflow/process steps out** — PR submission, WI updates, patchbacks are NOT part of the resolution plan's scope. Only include code changes and testing.
 
 ### Step 5 — Next Actions
 Ask the user:
 1. Does the resolution plan look correct, or should any hypothesis be adjusted?
 2. Should any related items be investigated further?
-3. Ready to hand off to the issue-fixer agent?
+3. Ready to proceed with implementation?
 
 ### Step 6 — Retrospective
 After the task is complete (plan delivered and user is satisfied), reflect on your own performance. Present a brief retrospective to the user:
@@ -316,8 +316,8 @@ After the task is complete (plan delivered and user is satisfied), reflect on yo
 - [ ] Prior fixes in the same code area have been reviewed (if any exist)
 - [ ] Resolution plan saved to `{jobNumber}-resolution-plan.md`
 - [ ] Plan includes specific file paths and line numbers (not vague references)
-- [ ] Implementation steps are prescriptive (tell the fixer what to change, not what to investigate)
+- [ ] Implementation steps are prescriptive (describe what to change, not what to investigate)
 - [ ] Testing requirements name specific tests to write
 - [ ] No workflow/process steps leaked into the plan (PR submission, WI updates, patchbacks)
 - [ ] Risks and unknowns are explicitly called out
-- [ ] A fixer agent reading ONLY this plan could implement the fix without re-triaging
+- [ ] Someone reading ONLY this plan could implement the fix without re-investigating

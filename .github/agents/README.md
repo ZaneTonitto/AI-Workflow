@@ -7,7 +7,7 @@ Custom agent definitions for CargoWise development workflows.
 | Agent | Description |
 | ----- | ----------- |
 | [issue-investigator](issue-investigator.agent.md) | Investigate and analyze work items (WI, CS, PRJ) — search related items, inspect code, and produce resolution plans. |
-| [issue-fixer](issue-fixer.agent.md) | Implement code fixes in the CargoWise repository using a resolution plan from the issue-investigator agent. |
+| [issue-fixer](issue-fixer.agent.md) | Implement code fixes in the CargoWise repository using a resolution plan. |
 
 ## Structure
 

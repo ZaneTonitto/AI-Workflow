@@ -18,7 +18,7 @@ Agent definitions live in `.github/agents/`. Each agent has a focused purpose an
 | Agent | Description |
 | ----- | ----------- |
 | [issue-investigator](.github/agents/issue-investigator.agent.md) | Investigate and analyze CargoWise work items (WI, CS, PRJ) — search related items, inspect code, and produce resolution plans. |
-| [issue-fixer](.github/agents/issue-fixer.agent.md) | Implement code fixes in the CargoWise repository using a resolution plan from the issue-investigator agent. |
+| [issue-fixer](.github/agents/issue-fixer.agent.md) | Implement code fixes in the CargoWise repository using a resolution plan. |
 
 See [`.github/agents/README.md`](.github/agents/README.md) for conventions.
 

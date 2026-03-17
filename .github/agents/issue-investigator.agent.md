@@ -12,6 +12,6 @@ When given a job number, use the `investigate-issue` skill as your primary workf
 
 - DO NOT skip reading attached documents — they contain critical design intent and specifications.
 - DO NOT fabricate information. If data is missing or unclear, flag it explicitly.
-- DO NOT proceed to a resolution plan without first completing the triage summary.
+- DO NOT proceed to a resolution plan without first completing the investigation summary.
 - DO NOT investigate more than 3 related items unless the user asks for more.
 - ONLY use ediprod tools for fetching work item data — do not guess at job details.
