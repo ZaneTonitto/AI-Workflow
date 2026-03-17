@@ -6,7 +6,7 @@ Reusable skill definitions that can be composed into agents for CargoWise develo
 
 | Skill | Description |
 | ----- | ----------- |
-| [triage-issue](triage-issue/) | Investigate a work item, gather context, and produce a resolution plan. |
+| [investigate-issue](investigate-issue/) | Investigate a work item, gather context, and produce a resolution plan. |
 | [fix-issue](fix-issue/) | Implement a code fix and write unit tests based on a resolution plan. |
 | [github-code-navigation](github-code-navigation/) | Locate files and understand code patterns via GitHub code search. |
 

@@ -1,23 +1,23 @@
 # Fix Issue
 
 ## Purpose
-Given a work item number that has been triaged by the issue-triager agent, read the resolution plan from the work item description and implement the fix — production code changes and unit tests — in the locally cloned CargoWise repository. Changes are left uncommitted for the developer to review.
+Given a work item number that has been investigated by the issue-investigator agent, read the resolution plan and implement the fix — production code changes and unit tests — in the locally cloned CargoWise repository. Changes are left uncommitted for the developer to review.
 
 ## Trigger
 User provides a job number (e.g., `WI00878427`) that already has a resolution plan in its work item description.
 
 ## Prerequisites
-- The work item has been triaged and has a resolution plan written by the issue-triager agent in its description.
+- The work item has been investigated and has a resolution plan written by the issue-investigator agent.
 - The CargoWise repository is cloned locally at `C:\git\GitHub\WiseTechGlobal\CargoWise`.
 - The `$env:STAFF_CODE` environment variable is set.
 
 ## Workflow
 
 ### Step 1 — Read the Resolution Plan
-Retrieve the resolution plan that serves as the handoff document from the issue-triager agent.
+Retrieve the resolution plan that serves as the handoff document from the issue-investigator agent.
 
 1. **Get job details** using `get-job-details` with the provided job number.
-   - Extract the resolution plan from the work item description. It will be preceded by a `triage-agent` timestamp header.
+   - Extract the resolution plan from the work item description.
    - Parse out: Problem Statement, Root Cause Hypothesis, Fix Specification (files to modify, implementation steps, code changes), Testing Requirements, Risks & Unknowns, Key Files.
 2. **Check for a local markdown plan** — look for `{jobNumber}-resolution-plan.md` in the current workspace. If it exists, prefer it over the WI description version as it contains the full plan with metadata.
 3. **Validate completeness** — the plan MUST contain at minimum:
@@ -289,7 +289,7 @@ After the implementation is complete (builds pass, tests pass, diff reviewed), r
 
 | Condition | Action |
 |---|---|
-| Resolution plan is missing or empty | Stop. Ask user to run issue-triager first. |
+| Resolution plan is missing or empty | Stop. Ask user to run issue-investigator first. |
 | Plan lacks specific file paths | Stop. Ask user to re-triage with source code inspection. |
 | Plan's before/after snippets don't match current code | Report discrepancy; attempt to adapt if minor. Stop if structural. |
 | Target file has been heavily modified since the plan | Stop. Report that the plan may be stale and ask for re-triage. |

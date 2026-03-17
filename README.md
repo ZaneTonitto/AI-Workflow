@@ -17,8 +17,8 @@ Agent definitions live in `.github/agents/`. Each agent has a focused purpose an
 
 | Agent | Description |
 | ----- | ----------- |
-| [issue-triager](.github/agents/issue-triager.agent.md) | Triage and analyze CargoWise work items (WI, CS, PRJ) — investigate issues, search related items, and produce resolution plans. |
-| [issue-fixer](.github/agents/issue-fixer.agent.md) | Implement code fixes in the CargoWise repository using a resolution plan from the issue-triager agent. |
+| [issue-investigator](.github/agents/issue-investigator.agent.md) | Investigate and analyze CargoWise work items (WI, CS, PRJ) — search related items, inspect code, and produce resolution plans. |
+| [issue-fixer](.github/agents/issue-fixer.agent.md) | Implement code fixes in the CargoWise repository using a resolution plan from the issue-investigator agent. |
 
 See [`.github/agents/README.md`](.github/agents/README.md) for conventions.
 
@@ -28,7 +28,7 @@ Reusable skills live in `.github/skills/`. Skills encapsulate specific capabilit
 
 | Skill | Description |
 | ----- | ----------- |
-| [triage-issue](.github/skills/triage-issue/) | Investigate a work item, gather context, and produce a resolution plan. |
+| [investigate-issue](.github/skills/investigate-issue/) | Investigate a work item, gather context, and produce a resolution plan. |
 | [fix-issue](.github/skills/fix-issue/) | Implement a code fix and write unit tests based on a resolution plan. |
 | [github-code-navigation](.github/skills/github-code-navigation/) | Locate files and understand code patterns via GitHub code search. |
 

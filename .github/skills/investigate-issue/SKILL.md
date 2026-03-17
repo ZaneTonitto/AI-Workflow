@@ -1,7 +1,7 @@
-# Issue Triage & Analysis
+# Issue Investigation & Analysis
 
 ## Purpose
-Given a work item number (WI, CS, or PRJ), perform a structured triage to understand the issue and produce an actionable resolution plan.
+Given a work item number (WI, CS, or PRJ), perform a structured investigation to understand the issue and produce an actionable resolution plan.
 
 ## Trigger
 User provides a job number (e.g., `WI00878427`, `CS00034343`, `PRJ00049378`).
@@ -88,7 +88,7 @@ Use the `documentation` MCP server to cross-reference the issue against existing
      query: "{error message or core symptom from the issue}"
      isActive: true   (check open items first, then false for closed/resolved)
    ```
-   If duplicates or closely related items are found, note them in the triage summary and consider whether the existing fix applies.
+   If duplicates or closely related items are found, note them in the investigation summary and consider whether the existing fix applies.
 
 2. **Check for related incidents** — Search ediprod incidents for the same symptoms reported by clients.
    ```
@@ -130,13 +130,13 @@ Use the `documentation` MCP server to cross-reference the issue against existing
 - **Rephrase queries** using domain vocabulary — don't just paste the raw error message. Add component names, module codes, and synonyms.
 - **Use `requiredWords`** to force critical terms (e.g., a specific class name or error code) when results are noisy.
 - **Search active then closed** — check `isActive: true` first for open duplicates, then `isActive: false` to find prior resolutions.
-- **Incorporate findings** into the triage summary and resolution plan — note duplicate WIs, reference prior fixes, and cite relevant documentation.
+- **Incorporate findings** into the investigation summary and resolution plan — note duplicate WIs, reference prior fixes, and cite relevant documentation.
 
-### Step 3 — Triage Summary
+### Step 3 — Investigation Summary
 Present a structured summary:
 
 ```
-## Triage Summary
+## Investigation Summary
 
 **Job:** {jobNumber} — {title}
 **Status:** {status}
@@ -157,7 +157,7 @@ Present a structured summary:
 ```
 
 ### Step 4 — Resolution Plan (Issue-Fixer Handoff)
-Produce a resolution plan structured as a **handoff document for an issue-fixer agent**. The fixer agent will receive ONLY this document — it will not re-triage, so every piece of context it needs must be included.
+Produce a resolution plan structured as a **handoff document for an issue-fixer agent**. The fixer agent will receive ONLY this document — it will not re-investigate, so every piece of context it needs must be included.
 
 **Output:** Write to `{jobNumber}-resolution-plan.md` in the repo root.
 
@@ -266,7 +266,7 @@ After the task is complete (plan delivered and user is satisfied), reflect on yo
 ## Retrospective
 
 ### What went well
-- {Things that worked effectively during this triage — e.g., "Knowledge search found a prior fix in WI00912345 that directly informed the root cause hypothesis"}
+- {Things that worked effectively during this investigation — e.g., "Knowledge search found a prior fix in WI00912345 that directly informed the root cause hypothesis"}
 
 ### What was difficult or slow
 - {Bottlenecks, dead ends, or areas where you struggled — e.g., "Took multiple search queries to locate the relevant source file because the stack trace referenced an intermediate assembly"}
@@ -279,7 +279,7 @@ After the task is complete (plan delivered and user is satisfied), reflect on yo
 - **Fix specification confidence:** {High / Medium / Low} — {why}
 
 ### Suggested improvements to agent design
-{Only suggest changes when you genuinely identified a gap or friction point. Do NOT suggest changes for the sake of it. Each suggestion should reference a specific moment during this triage that motivated it.}
+{Only suggest changes when you genuinely identified a gap or friction point. Do NOT suggest changes for the sake of it. Each suggestion should reference a specific moment during this investigation that motivated it.}
 
 - **Skill/workflow change:** {e.g., "Step 2b should search closed workitems by default — I had to manually re-run with isActive: false to find the prior fix"}
 - **New tool or data source:** {e.g., "A tool to resolve assembly names to source repo paths would have saved 3 search iterations"}
@@ -288,8 +288,8 @@ After the task is complete (plan delivered and user is satisfied), reflect on yo
 ```
 
 **Retrospective guidelines:**
-- Be honest and specific — reference actual moments from this triage session, not hypotheticals.
-- Only suggest design changes that would have materially helped *this* triage. Do not suggest speculative improvements.
+- Be honest and specific — reference actual moments from this investigation session, not hypotheticals.
+- Only suggest design changes that would have materially helped *this* investigation. Do not suggest speculative improvements.
 - Keep it concise — this is a reflection, not a redesign document.
 - The user will decide whether to act on suggestions. Do not self-modify.
 
