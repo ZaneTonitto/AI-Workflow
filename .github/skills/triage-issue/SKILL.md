@@ -159,39 +159,7 @@ Present a structured summary:
 ### Step 4 — Resolution Plan (Issue-Fixer Handoff)
 Produce a resolution plan structured as a **handoff document for an issue-fixer agent**. The fixer agent will receive ONLY this document — it will not re-triage, so every piece of context it needs must be included.
 
-**Output the plan in two places:**
-
-1. **Markdown file** — Write to `{jobNumber}-resolution-plan.md` in the repo root.
-2. **Work item description** — **Append** to the work item using `update-job-details` with the plan converted to HTML (see HTML conversion rules below).
-
-**CRITICAL — Preserving existing description content:**
-
-The work item description may already contain notes from human developers. These notes typically start with a staff code and timestamp, e.g.:
-
-```
-AQN 03-Mar-26 09:23 GMT+11:00:
-```
-
-You MUST preserve all existing description content. To do this:
-1. Read the current description from the `get-job-details` response.
-2. Prepend the existing content, then add a blank line separator.
-3. Add your own **bolded timestamped note** using this format:
-   ```
-   **triage-agent {DD-MMM-YY HH:MM} GMT+{offset}:**
-   ```
-   Use the current UTC time converted to the local timezone (use `+11:00` as default if unknown). Example:
-   ```
-   **triage-agent 06-Mar-26 14:30 GMT+11:00:**
-   ```
-4. Follow your timestamp with the resolution plan HTML.
-
-The final description sent to `update-job-details` should look like:
-```
-{existing description content}
-
-**triage-agent {timestamp}:**
-{resolution plan HTML}
-```
+**Output:** Write to `{jobNumber}-resolution-plan.md` in the repo root.
 
 The plan MUST follow this structure:
 
@@ -276,35 +244,10 @@ After:
 - **{path/to/file.cs}** — {Why this file matters — crash site, caller, related logic, test location}
 ```
 
-**HTML Conversion Rules for Work Item Description:**
-
-The work item description only supports HTML formatting — not Markdown. When writing the plan to the work item via `update-job-details`, convert the Markdown plan to HTML using these rules:
-
-| Markdown | HTML |
-|---|---|
-| `# Heading` | `<h1>Heading</h1>` |
-| `## Heading` | `<h2>Heading</h2>` |
-| `### Heading` | `<h3>Heading</h3>` |
-| `**bold**` | `<b>bold</b>` |
-| `*italic*` | `<i>italic</i>` |
-| `` `code` `` | `<code>code</code>` |
-| `- list item` | `<ul><li>list item</li></ul>` |
-| `1. list item` | `<ol><li>list item</li></ol>` |
-| `[text](url)` | `<a href="url">text</a>` |
-| Code block (```) | `<pre><code>…</code></pre>` |
-| Paragraph break | `<br/>` (preferred) |
-| `- [ ] item` | `<ul><li>☐ item</li></ul>` |
-
-- Do NOT use Markdown syntax in the HTML version — it will render as raw text.
-- Keep the same structure and content as the Markdown file; only the formatting changes.
-- **Keep the HTML compact — no double blank lines.** Do NOT wrap every sentence in `<p>` tags. Use `<br/>` only for intentional line breaks within a section (e.g., separating items in a description). Headings (`<h1>`–`<h3>`), lists (`<ul>`, `<ol>`), and `<pre>` blocks already create their own spacing — do NOT add `<br/>` before or after them. Never output consecutive `<br/>` tags (`<br/><br/>` or worse). The goal is a dense, readable format with zero unnecessary whitespace. Before submitting, mentally scan the HTML for any sequence of blank lines or stacked `<br/>` tags and remove them.
-- **Do NOT use HTML tables** — they render poorly in work item descriptions (no borders, just floating text). Use bold labels with `<b>` and `<br/>` line breaks instead. For example, instead of a table use: `<b>File:</b> path/to/file.cs — description<br/>`
-- **Skip redundant metadata** — do NOT include the `# {jobNumber} — Resolution Plan` heading, the `## Summary` section, or fields like Job, Title, Status, Product/Module, Area, Component, Type in the WI description — these are already visible in the work item's own panels. Start the WI description content directly from the `## Problem Statement` section. The full Summary section is only needed in the markdown file (which serves as a standalone handoff document for the fixer agent).
-
 **Guidelines for writing the plan:**
 - **Be exhaustive on context** — the fixer agent has no prior knowledge of the issue.
 - **Be prescriptive on implementation** — tell the fixer exactly what to change, not just where to look.
-- **Include before/after code snippets** — when source code was read in Step 2a and the fix is Low or Medium complexity, include concrete before/after code blocks in the "Code Changes" section. This removes ambiguity and lets the fixer apply changes directly. Use the same snippets in both the markdown file and the HTML work item description (using `<pre><code>` for HTML).
+- **Include before/after code snippets** — when source code was read in Step 2a and the fix is Low or Medium complexity, include concrete before/after code blocks in the "Code Changes" section. This removes ambiguity and lets the fixer apply changes directly. Use the same snippets in the markdown file.
 - **Separate investigation from action** — all investigation should be done during triage. The plan should contain conclusions, not "investigate X" steps.
 - **Include source links** — GitHub permalink URLs to the exact lines where changes are needed.
 - **Name specific files and line numbers** — vague references like "the reader class" are not acceptable.
@@ -372,7 +315,6 @@ After the task is complete (plan delivered and user is satisfied), reflect on yo
 - [ ] Knowledge search performed — checked for duplicate WIs, related incidents, and domain docs
 - [ ] Prior fixes in the same code area have been reviewed (if any exist)
 - [ ] Resolution plan saved to `{jobNumber}-resolution-plan.md`
-- [ ] Resolution plan written to work item description via `update-job-details` as HTML
 - [ ] Plan includes specific file paths and line numbers (not vague references)
 - [ ] Implementation steps are prescriptive (tell the fixer what to change, not what to investigate)
 - [ ] Testing requirements name specific tests to write
